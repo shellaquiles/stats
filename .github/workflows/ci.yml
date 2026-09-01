@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validar JSON de métricas
+        run: python3 -m json.tool data.json > /dev/null
+
+      - name: Syntax check scripts Python
+        run: |
+          python3 -m py_compile scripts/update_metrics.py scripts/generate_preview.py
+
+      - name: HTML básico
+        run: test -f index.html && grep -q '<html' index.html
