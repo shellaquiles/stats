@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@shellaquiles | Stats GitHub</title>
+
+  <!-- OpenGraph / WhatsApp / Telegram / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="shellaquiles.org" />
+  <meta property="og:title" content="Estadísticas de @shellaquiles en GitHub 📊 ¡Crea tu dashboard gratis!" id="og-title" />
+  <meta property="og:description" content="Descubre el alcance real de tus proyectos de código abierto. ¿Cuánto impacto tienen tus repositorios? Genera tu dashboard gratis con un fork." id="og-desc" />
+  <meta property="og:image" content="./og-preview.png" />
+  <meta property="og:image:secure_url" content="./og-preview.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Estadísticas de @shellaquiles en GitHub 📊 ¡Crea tu dashboard gratis!" id="twitter-title" />
+  <meta name="twitter:description" content="Descubre el alcance real de tus proyectos de código abierto. ¿Cuánto impacto tienen tus repositorios? Genera tu dashboard gratis con un fork." id="twitter-desc" />
+  <meta name="twitter:image" content="./og-preview.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1e3a8a; --green: #046a38; --amber: #b45309;
+      --ink: #09090b; --paper: #f8fafc;
+      --zinc-100: #f4f4f5; --zinc-200: #e4e4e7;
+      --zinc-300: #d4d4d8; --zinc-500: #71717a; --zinc-700: #3f3f46;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar {
+      border-bottom: 1px solid var(--zinc-300); background: #fff;
+      padding: 0 2rem; height: 52px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-brand {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 700;
+      letter-spacing: 0; text-transform: none; color: var(--ink);
+      text-decoration: none; display: flex; align-items: center; gap: 0;
+    }
+    .topbar-center {
+      display: flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; font-weight: 700; color: var(--ink); text-decoration: none;
+      background: var(--zinc-100); border: 1px solid var(--zinc-300); padding: 0.2rem 0.6rem;
+      transition: all 0.15s;
+    }
+    .topbar-center:hover { border-color: var(--navy); color: var(--navy); background: #fff; }
+    .topbar-center i { width: 13px; height: 13px; }
+    .topbar-nav { display: flex; gap: 1.5rem; align-items: center; }
+    .topbar-nav a {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--zinc-500);
+      text-decoration: none; transition: color 0.15s;
+    }
+    .topbar-nav a:hover { color: var(--navy); }
+    .topbar-nav a.active { color: var(--navy); border-bottom: 2px solid var(--navy); padding-bottom: 1px; }
+
+    .topbar-cta {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--navy); color: #fff !important;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.35rem 0.75rem; border: 1px solid var(--navy);
+      text-decoration: none; transition: all 0.15s ease;
+    }
+    .topbar-cta:hover { background: #172554; border-color: #172554; }
+    .topbar-cta i { width: 12px; height: 12px; }
+
+    /* ORG HERO */
+    .org-hero {
+      background: #fff; border-bottom: 1px solid var(--zinc-200);
+      padding: 3rem 2rem;
+    }
+    .org-hero-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: center;
+    }
+    @media (max-width: 860px) { .org-hero-inner { grid-template-columns: 1fr; } }
+
+    .org-title-wrap {
+      display: flex; align-items: center; justify-content: flex-start; gap: 1.25rem;
+      margin-bottom: 0.4rem;
+    }
+    .org-avatar-wrap {
+      flex-shrink: 0;
+    }
+    .org-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      border: 1px solid var(--zinc-300); background: var(--zinc-100);
+      display: block; object-fit: cover;
+    }
+    .org-hero-meta h1 {
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.03em;
+      color: var(--ink); line-height: 1.1; margin: 0;
+    }
+    .org-hero-meta h1 em { font-style: normal; color: var(--navy); }
+    .org-hero-meta .subtitle {
+      font-size: 0.875rem; color: var(--zinc-500); margin-bottom: 2rem; line-height: 1.5; margin-top: 0.4rem;
+    }
+
+    .org-kpis {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      border: 1px solid var(--zinc-200); background: var(--zinc-200);
+    }
+    .org-kpi {
+      background: #fff; padding: 1rem 0.75rem; text-align: center;
+    }
+    .org-kpi-val {
+      font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700;
+      color: var(--ink); display: block; line-height: 1;
+    }
+    .org-kpi-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--zinc-500);
+      margin-top: 0.3rem; display: flex; align-items: center; justify-content: center; gap: 0.2rem;
+    }
+    .org-kpi-label i { width: 10px; height: 10px; }
+
+    /* ORG RADAR CANVAS */
+    .org-radar-wrap {
+      position: relative; width: 100%; max-width: 380px;
+      height: 360px;
+    }
+    .org-radar-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+    .org-radar-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--zinc-500);
+      text-align: center; margin-top: 0.5rem;
+    }
+
+    /* SECTION DIVIDER */
+    .section-header {
+      max-width: 1200px; margin: 2.5rem auto 0; padding: 0 2rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-header h2 {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--zinc-500);
+      white-space: nowrap;
+    }
+    .section-header-line { flex: 1; height: 1px; background: var(--zinc-200); }
+
+    /* AXIS LEGEND */
+    .axis-legend {
+      max-width: 1200px; margin: 1rem auto 0; padding: 0 2rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .axis-item {
+      display: flex; align-items: center; gap: 0.35rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.63rem;
+      letter-spacing: 0.07em; text-transform: uppercase; color: var(--zinc-500);
+    }
+    .axis-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* REPO GRID */
+    .radar-grid {
+      max-width: 1200px; margin: 1.5rem auto; padding: 0 2rem 4rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.25rem;
+    }
+
+    /* REPO CARD */
+    .repo-card {
+      background: #fff; border: 1px solid var(--zinc-300);
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: border-color 0.15s;
+    }
+    .repo-card:hover { border-color: var(--zinc-500); }
+
+    .card-header {
+      padding: 1.25rem 1.25rem 0.85rem; border-bottom: 1px solid var(--zinc-200);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem;
+    }
+    .card-title-block { flex: 1; min-width: 0; }
+    .card-icon-wrap {
+      width: 34px; height: 34px; border: 1px solid var(--zinc-200); background: var(--zinc-100);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-icon-wrap i { width: 16px; height: 16px; }
+    .card-name {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 700;
+      color: var(--ink); text-decoration: none;
+      display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-name:hover { color: var(--navy); }
+    .card-desc {
+      font-size: 0.75rem; color: var(--zinc-500); margin-top: 0.25rem; line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 0.5rem; padding-top: 0.4rem; border-top: 1px dashed var(--zinc-200);
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--zinc-500);
+    }
+    .card-meta-item { display: flex; align-items: center; gap: 0.3rem; }
+    .card-meta-item i { width: 11px; height: 11px; color: var(--zinc-400); }
+    .card-meta-item strong { color: var(--ink); }
+
+    .card-badge {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; padding: 0.12rem 0.4rem;
+      border: 1px solid currentColor; display: inline-block;
+    }
+
+    .card-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--zinc-200); background: #fff; }
+    .stat-cell { padding: 0.75rem 0.4rem; text-align: center; border-right: 1px solid var(--zinc-200); }
+    .stat-cell:last-child { border-right: none; }
+    .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: var(--ink); display: block; }
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--zinc-500); margin-top: 0.2rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.2rem;
+    }
+    .stat-label i { width: 10px; height: 10px; }
+
+    .card-footer {
+      padding: 0.65rem 1.25rem; background: var(--zinc-100);
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    }
+    .tag-list { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--zinc-700); background: #fff; border: 1px solid var(--zinc-300); padding: 0.15rem 0.35rem; font-weight: 600;
+    }
+    .tag-colab {
+      background: #f0fdf4; border-color: #bbf7d0; color: #166534; display: flex; align-items: center; gap: 0.25rem;
+    }
+    .tag-colab i { width: 9px; height: 9px; color: #15803d; }
+    .card-link {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); text-decoration: none;
+      display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0;
+    }
+    .card-link i { width: 11px; height: 11px; }
+    .card-link:hover { text-decoration: underline; }
+
+    /* TABLE SECTION */
+    .table-section {
+      max-width: 1200px; margin: 0 auto 4rem; padding: 0 2rem;
+    }
+    .table-wrap {
+      background: #fff; border: 1px solid var(--zinc-300); font-family: 'JetBrains Mono', monospace;
+      overflow-x: auto;
+    }
+    .table-header {
+      padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--zinc-200); background: var(--zinc-100);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-title {
+      font-size: 0.75rem; font-weight: 700; color: var(--ink); text-transform: uppercase;
+      letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .table-title i { width: 14px; height: 14px; color: var(--navy); }
+    .table-badge {
+      font-size: 0.6rem; font-weight: 700; color: var(--zinc-500); text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .stats-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.72rem; }
+    .stats-table thead tr {
+      border-bottom: 1px solid var(--zinc-300); background: #fff;
+    }
+    .stats-table th {
+      padding: 0.65rem 0.85rem; font-size: 0.62rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--zinc-500); white-space: nowrap;
+      user-select: none;
+    }
+    .stats-table th.sortable { cursor: pointer; transition: background-color 0.15s, color 0.15s; }
+    .stats-table th.sortable:hover { background: var(--zinc-100); color: var(--ink); }
+    .stats-table th.sort-active { color: var(--navy); background: #f0f4ff; }
+    .stats-table th.num, .stats-table td.num { text-align: right; }
+    .stats-table td {
+      padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--zinc-200); color: var(--ink); white-space: nowrap;
+    }
+    .stats-table tbody tr:hover { background: #fafafa; }
+    .table-repo-link { font-weight: 700; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 0.35rem; }
+    .table-repo-link:hover { color: var(--navy); text-decoration: underline; }
+    .table-tag {
+      font-size: 0.58rem; text-transform: uppercase; padding: 0.1rem 0.3rem; border: 1px solid var(--zinc-300); background: var(--zinc-100);
+    }
+    .table-totals-row { background: var(--zinc-100) !important; font-weight: 700; border-top: 2px solid var(--zinc-300); }
+
+    /* CONTRIBUTORS SECTION */
+    .contrib-section {
+      max-width: 1200px; margin: 0 auto 5rem; padding: 0 2rem;
+    }
+    .contrib-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;
+    }
+    .contrib-card {
+      background: #fff; border: 1px solid var(--zinc-300); padding: 0.85rem 1rem;
+      display: flex; align-items: center; gap: 0.85rem; text-decoration: none;
+      transition: border-color 0.15s; font-family: 'JetBrains Mono', monospace;
+    }
+    .contrib-card:hover { border-color: var(--navy); }
+    .contrib-avatar {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--zinc-300); flex-shrink: 0;
+    }
+    .contrib-info { min-width: 0; flex: 1; }
+    .contrib-login {
+      font-size: 0.78rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .contrib-login:hover { color: var(--navy); }
+    .contrib-sub {
+      font-size: 0.62rem; color: var(--zinc-500); margin-top: 0.15rem;
+    }
+    .contrib-commits {
+      font-size: 0.65rem; font-weight: 700; color: var(--navy); margin-top: 0.2rem;
+    }
+
+    /* CTA BANNER & FOOTER */
+    .cta-section {
+      max-width: 1200px; margin: 0 auto 4rem; padding: 0 2rem;
+    }
+    .cta-card {
+      background: #fff; border: 1px solid var(--zinc-300); padding: 1.5rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+      flex-wrap: wrap; font-family: 'JetBrains Mono', monospace;
+    }
+    .cta-text { max-width: 700px; }
+    .cta-title {
+      font-size: 0.8rem; font-weight: 700; color: var(--ink); text-transform: uppercase;
+      letter-spacing: 0.06em; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .cta-title i { width: 14px; height: 14px; color: var(--green); }
+    .cta-desc {
+      font-size: 0.72rem; color: var(--zinc-500); margin-top: 0.35rem; line-height: 1.5; font-family: 'Inter', sans-serif;
+    }
+    .cta-desc code {
+      background: var(--zinc-100); border: 1px solid var(--zinc-200); padding: 0.1rem 0.3rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--ink);
+    }
+    .cta-btn {
+      background: var(--ink); color: #fff; border: 1px solid var(--ink); padding: 0.55rem 1rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;
+      transition: background-color 0.15s;
+    }
+    .cta-btn:hover { background: #000; }
+    .cta-btn i { width: 13px; height: 13px; color: #4ade80; }
+
+    body { font-family: 'Inter', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; padding-bottom: 50px; }
+
+    /* FOOTER (FIXED) */
+    .site-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      border-top: 1px solid var(--zinc-300); background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      padding: 0.65rem 2rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--zinc-500);
+    }
+    .site-footer-inner {
+      max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .site-footer a { color: var(--ink); text-decoration: none; font-weight: 700; }
+    .site-footer a:hover { color: var(--navy); text-decoration: underline; }
+
+    #loading {
+      text-align: center; padding: 6rem 2rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+      color: var(--zinc-500); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <a class="topbar-brand" href="index3.html"><span style="color:#71717a;font-weight:400;">{{</span><span style="color:#22c55e;font-weight:700;">shell</span><span style="color:#09090b;font-weight:700;">aquiles</span><span style="color:#f43f5e;font-weight:700;">.org</span><span style="color:#71717a;font-weight:400;">}}</span></a>
+
+    <!-- Center User / Org GitHub Link -->
+    <a class="topbar-center" id="topbar-center-link" href="https://github.com/shellaquiles" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+        <path d="M9 18c-4.51 2-5-2-7-2"></path>
+      </svg>
+      <span id="topbar-center-user">@shellaquiles</span>
+    </a>
+
+    <nav class="topbar-nav">
+      <a href="#stats">Stats Globales</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#colaboradores">Colaboradores</a>
+      <a class="topbar-cta" href="https://github.com/shellaquiles/stats" target="_blank" rel="noopener">
+        <i data-lucide="git-fork"></i>
+        <span>¡Crea el tuyo gratis!</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <i data-lucide="loader-2" style="display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;animation:spin 1s linear infinite;"></i>
+    Cargando métricas...
+  </div>
+
+  <!-- ORG HERO (hidden until data loads) -->
+  <section class="org-hero" id="org-hero" style="display:none;">
+    <div class="org-hero-inner">
+      <div class="org-hero-meta">
+        <div class="org-title-wrap">
+          <div class="org-avatar-wrap" id="org-avatar-wrap" style="display:none;">
+            <a id="org-avatar-link" href="https://github.com/shellaquiles" target="_blank" rel="noopener">
+              <img id="org-avatar-img" class="org-avatar" src="" alt="Avatar" />
+            </a>
+          </div>
+          <h1>Huella Digital<br><em id="org-handle">@usuario</em></h1>
+        </div>
+        <p class="subtitle" id="org-subtitle">Radar acumulado de todos los repositorios públicos</p>
+        <div class="org-kpis" id="org-kpis"></div>
+      </div>
+      <div class="org-radar-wrap">
+        <canvas id="org-radar"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION HEADER: STATS GLOBALES -->
+  <div class="section-header" id="section-stats" style="display:none;margin-top:2.5rem;">
+    <h2 id="stats">Stats Globales <span id="stats-handle" style="color:var(--navy);font-weight:700;margin-left:0.25rem;"></span></h2>
+    <div class="section-header-line"></div>
+  </div>
+
+  <!-- TABLE SECTION -->
+  <section class="table-section" id="table-section" style="display:none;margin-top:1.5rem;">
+    <div class="table-wrap">
+      <table class="stats-table" id="main-stats-table">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="name"><i data-lucide="folder-git-2" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i> Proyecto <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="language"><i data-lucide="code-2" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i> Stack <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="created_at"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i> Creado <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="stars"><i data-lucide="star" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#b45309;"></i> Stars <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="forks"><i data-lucide="git-fork" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#1e3a8a;"></i> Forks <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="clones_14d"><i data-lucide="download" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#0891b2;"></i> Clones <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="views_14d"><i data-lucide="eye" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#db2777;"></i> Visitas <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="commits"><i data-lucide="git-commit" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#046a38;"></i> Commits <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="releases"><i data-lucide="tag" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i> Releases <span class="sort-icon"></span></th>
+            <th class="num sortable" data-sort="prs"><i data-lucide="git-pull-request" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;color:#046a38;"></i> PRs <span class="sort-icon"></span></th>
+            <th class="sortable" data-sort="license"><i data-lucide="scale" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i> Licencia <span class="sort-icon"></span></th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Render dinámico -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION HEADER: POR REPOSITORIO -->
+  <div class="section-header" id="section-repos" style="display:none;margin-top:3.5rem;">
+    <h2 id="proyectos">Por Repositorio</h2>
+    <div class="section-header-line"></div>
+  </div>
+
+  <!-- REPO GRID -->
+  <main class="radar-grid" id="radar-grid" style="display:none;"></main>
+
+  <!-- SECTION HEADER: COLABORADORES Y CORE TEAM -->
+  <div class="section-header" id="section-contrib" style="display:none;margin-top:3.5rem;">
+    <h2 id="colaboradores">Colaboradores y Core Team <span id="contrib-handle" style="color:var(--navy);font-weight:700;margin-left:0.25rem;"></span></h2>
+    <div class="section-header-line"></div>
+  </div>
+
+  <!-- CONTRIBUTORS SECTION -->
+  <section class="contrib-section" id="contrib-section" style="display:none;margin-top:1.5rem;">
+    <div class="contrib-grid" id="contrib-grid">
+      <!-- Render dinámico -->
+    </div>
+  </section>
+
+  <!-- CTA BANNER SECTION -->
+  <section class="cta-section" id="cta-section" style="display:none;">
+    <div class="cta-card">
+      <div class="cta-text">
+        <div class="cta-title">
+          <i data-lucide="git-fork"></i>
+          <span>Crea tu propio dashboard de estadísticas en 3 minutos</span>
+        </div>
+        <p class="cta-desc">
+          Solo necesitas hacer un fork en GitHub. El sistema detecta tu usuario en automático y publica tus métricas sin que tengas que tocar código.
+        </p>
+      </div>
+      <a class="cta-btn" href="https://github.com/shellaquiles/stats" target="_blank" rel="noopener">
+        <i data-lucide="git-fork"></i>
+        <span>¡Quiero mi propio Dashboard!</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- SITE FOOTER (FIXED) -->
+  <footer class="site-footer" id="site-footer" style="display:none;">
+    <div class="site-footer-inner">
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <i data-lucide="terminal" style="width:13px;height:13px;color:var(--navy);"></i>
+        <span id="footer-owner-text" style="font-weight:700;color:var(--ink);">@shellaquiles</span>
+        <span>•</span>
+        <span id="footer-tagline">ACTIVO DESDE AGOSTO 2025</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <span>Impulsado por <a href="https://github.com/shellaquiles/stats" target="_blank" rel="noopener">shellaquiles/stats</a></span>
+        <span class="table-tag" id="footer-version">v1.0.0</span>
+        <span>•</span>
+        <a href="https://github.com/shellaquiles" target="_blank" rel="noopener" id="footer-gh-link">GitHub ↗</a>
+        <span>•</span>
+        <a href="https://shellaquiles.org" target="_blank" rel="noopener" id="footer-web-link">Sitio Oficial</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  const AXES = [
+    { key: 'repos_count',  label: 'Proyectos',    icon: 'layers',       color: '#09090b' },
+    { key: 'stars',        label: 'Stars',        icon: 'star',         color: '#b45309' },
+    { key: 'forks',        label: 'Forks',        icon: 'git-fork',     color: '#1e3a8a' },
+    { key: 'commits',      label: 'Commits',      icon: 'git-commit',   color: '#046a38' },
+    { key: 'contributors', label: 'Colaboradores', icon: 'users',       color: '#7c3aed' },
+    { key: 'clones_14d',   label: 'Clones 14d',   icon: 'download',     color: '#0891b2' },
+  ];
+
+  // Org radar: Proyectos, Stars, Forks, Colaboradores
+  const ORG_AXES = [
+    { key: 'repos_count',  label: 'Proyectos',    icon: 'layers',       color: '#09090b' },
+    { key: 'stars',        label: 'Stars',        icon: 'star',         color: '#b45309' },
+    { key: 'forks',        label: 'Forks',        icon: 'git-fork',     color: '#1e3a8a' },
+    { key: 'contributors', label: 'Colaboradores', icon: 'users',       color: '#7c3aed' },
+  ];
+
+  const ACCENT_MAP = {
+    'border-t-[#1e3a8a]': '#1e3a8a',
+    'border-t-[#046a38]': '#046a38',
+    'border-t-[#b45309]': '#b45309',
+    'border-t-zinc-800':  '#27272a',
+    'border-t-zinc-400':  '#a1a1aa',
+  };
+
+  function norm(val, max) { return Math.round((val / Math.max(1, max)) * 100); }
+
+  function makeRadar(canvasId, values, labels, accent, rawVals) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const accent20 = accent + '33';
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: accent20,
+          borderColor: accent,
+          borderWidth: 2.5,
+          pointBackgroundColor: accent,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#fff', borderColor: accent, borderWidth: 1,
+            titleColor: '#09090b', bodyColor: '#71717a',
+            titleFont: { family: 'JetBrains Mono', size: 11, weight: '700' },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            padding: 10,
+            callbacks: {
+              label: function(c) {
+                return '  ' + rawVals[c.dataIndex].toLocaleString() + ' (' + c.raw + '%)';
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            min: 0, max: 100, beginAtZero: true,
+            ticks: { display: false, stepSize: 25 },
+            pointLabels: { font: { family: 'JetBrains Mono', size: 10, weight: '500' }, color: '#71717a' },
+            grid: { color: '#e4e4e7', lineWidth: 1 },
+            angleLines: { color: '#d4d4d8', lineWidth: 1 },
+          }
+        }
+      }
+    });
+  }
+
+  async function loadTelemetry() {
+    const payload = await fetch('data.json').then(r => r.json());
+    const repos   = payload.repos || [];
+    const meta    = payload.meta  || {};
+    const handle  = meta.target || 'usuario';
+
+    // ── Hydrate handles & Avatar ──────────────────────────────
+    document.title = `@${handle} | Stats GitHub`;
+    const descText = `Descubre el alcance real de los proyectos de código abierto de @${handle}. ¿Cuánto impacto tienen tus repositorios? Genera tu dashboard gratis con un fork.`;
+    const socialTitle = `Estadísticas de @${handle} en GitHub 📊 ¡Crea tu dashboard gratis!`;
+    const ogTitleEl = document.getElementById('og-title');
+    if (ogTitleEl) ogTitleEl.setAttribute('content', socialTitle);
+    const ogDescEl = document.getElementById('og-desc');
+    if (ogDescEl) ogDescEl.setAttribute('content', descText);
+    const twTitleEl = document.getElementById('twitter-title');
+    if (twTitleEl) twTitleEl.setAttribute('content', socialTitle);
+    const twDescEl = document.getElementById('twitter-desc');
+    if (twDescEl) twDescEl.setAttribute('content', descText);
+
+    document.getElementById('org-handle').textContent = '@' + handle;
+    const tbh = document.getElementById('topbar-handle');
+    if (tbh) tbh.textContent = handle;
+    const centerUserEl = document.getElementById('topbar-center-user');
+    if (centerUserEl) centerUserEl.textContent = '@' + handle;
+    const centerLinkEl = document.getElementById('topbar-center-link');
+    if (centerLinkEl && meta.links?.github) centerLinkEl.href = meta.links.github;
+    const statsHandleEl = document.getElementById('stats-handle');
+    if (statsHandleEl) statsHandleEl.textContent = '@' + handle;
+    const contribHandleEl = document.getElementById('contrib-handle');
+    if (contribHandleEl) contribHandleEl.textContent = '@' + handle;
+
+    // Avatar
+    const avatarWrap = document.getElementById('org-avatar-wrap');
+    const avatarImg  = document.getElementById('org-avatar-img');
+    const avatarLink = document.getElementById('org-avatar-link');
+    if (avatarWrap && avatarImg) {
+      avatarImg.src = `https://github.com/${handle}.png?size=128`;
+      avatarImg.alt = `@${handle}`;
+      if (avatarLink && meta.links?.github) avatarLink.href = meta.links.github;
+      avatarWrap.style.display = 'block';
+    }
+
+    document.getElementById('org-subtitle').textContent =
+      'Radar acumulado de ' + repos.length + ' repositorios públicos de @' + handle;
+
+    // ── ORG TOTALS ─────────────────────────────────────────────
+    const totals = {
+      repos_count: repos.length
+    };
+    AXES.forEach(a => { if (a.key !== 'repos_count') totals[a.key] = repos.reduce((s, r) => s + (r[a.key] || 0), 0); });
+    const totalReleases = repos.reduce((s, r) => s + (r.releases || 0), 0);
+    const totalPRs      = repos.reduce((s, r) => s + (r.prs || 0), 0);
+
+    // KPI row (8 cells → 4)
+    const kpiDefs = [
+      { val: repos.length,       label: 'Repos',     icon: 'layers' },
+      { val: totals.stars,       label: 'Stars',     icon: 'star' },
+      { val: totals.commits,     label: 'Commits',   icon: 'git-commit' },
+      { val: totals.clones_14d,  label: 'Clones 14d',icon: 'download' },
+    ];
+    const kpiEl = document.getElementById('org-kpis');
+    kpiDefs.forEach(k => {
+      kpiEl.innerHTML +=
+        '<div class="org-kpi">' +
+          '<span class="org-kpi-val">' + k.val.toLocaleString() + '</span>' +
+          '<span class="org-kpi-label"><i data-lucide="' + k.icon + '"></i> ' + k.label + '</span>' +
+        '</div>';
+    });
+
+    // Normalize org totals against each other (max among ORG_AXES totals = 100)
+    const maxTotal  = Math.max(...ORG_AXES.map(a => totals[a.key]));
+    const orgValues  = ORG_AXES.map(a => norm(totals[a.key], maxTotal));
+    const orgRawVals = ORG_AXES.map(a => totals[a.key]);
+
+    // ── ORG RADAR ──────────────────────────────────────────────
+    const orgCtx = document.getElementById('org-radar').getContext('2d');
+    new Chart(orgCtx, {
+      type: 'radar',
+      data: {
+        labels: ORG_AXES.map(a => a.label),
+        datasets: [{
+          data: orgValues,
+          backgroundColor: '#1e3a8a22',
+          borderColor: '#1e3a8a',
+          borderWidth: 3,
+          pointBackgroundColor: ORG_AXES.map(a => a.color),
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 1000, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#fff', borderColor: '#1e3a8a', borderWidth: 1,
+            titleColor: '#09090b', bodyColor: '#71717a',
+            titleFont: { family: 'JetBrains Mono', size: 12, weight: '700' },
+            bodyFont: { family: 'JetBrains Mono', size: 12 },
+            padding: 12,
+            callbacks: {
+              label: function(c) {
+                return '  Total: ' + orgRawVals[c.dataIndex].toLocaleString() + ' (' + c.raw + '% del eje líder)';
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            min: 0, max: 100, beginAtZero: true,
+            ticks: { display: false, stepSize: 25 },
+            pointLabels: {
+              font: { family: 'JetBrains Mono', size: 11, weight: '700' },
+              color: '#3f3f46',
+            },
+            grid: { color: '#e4e4e7', lineWidth: 1 },
+            angleLines: { color: '#d4d4d8', lineWidth: 1 },
+          }
+        }
+      }
+    });
+
+    // ── SHOW SECTIONS ──────────────────────────────────────────
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    const orgHeroEl = document.getElementById('org-hero');
+    if (orgHeroEl) orgHeroEl.style.display = 'block';
+
+    const secReposEl = document.getElementById('section-repos');
+    if (secReposEl) secReposEl.style.display = 'flex';
+
+    const legendEl = document.getElementById('axis-legend');
+    if (legendEl) legendEl.style.display = 'none';
+
+    // ── REPO CARDS (SIN RADAR) ─────────────────────────────────
+    const grid = document.getElementById('radar-grid');
+    if (grid) {
+      grid.style.display = 'grid';
+      grid.innerHTML = '';
+    }
+
+    repos.forEach((repo, idx) => {
+      const accent   = ACCENT_MAP[repo.accentColor] || '#1e3a8a';
+
+      const card = document.createElement('div');
+      card.className = 'repo-card';
+      card.style.borderTop = '3px solid ' + accent;
+
+      const badgeHtml = repo.badge
+        ? '<span class="card-badge" style="color:' + accent + ';border-color:' + accent + ';">' + repo.badge + '</span>'
+        : '';
+
+      const createdDate = repo.created_at ? repo.created_at : '2025';
+      const colabsCount = repo.contributors || 1;
+      const pagesLink   = repo.has_pages ? (repo.pages_url || `https://${handle}.github.io/${repo.name}/`) : (repo.homepageUrl || null);
+
+      card.innerHTML =
+        '<div class="card-header">' +
+          '<div class="card-title-block">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.25rem;">' +
+              '<a class="card-name" href="' + repo.url + '" target="_blank" rel="noopener">' + repo.name + '</a>' +
+              badgeHtml +
+            '</div>' +
+            '<div class="card-desc">' + (repo.description || '—') + '</div>' +
+            '<div class="card-meta-row">' +
+              '<span class="card-meta-item"><i data-lucide="calendar"></i> Creado: <strong>' + createdDate + '</strong></span>' +
+              '<span class="card-meta-item"><i data-lucide="users"></i> Colabs: <strong style="color:#166534;">' + colabsCount + '</strong></span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card-icon-wrap" style="color:' + accent + ';border-color:' + accent + '22;">' +
+            '<i data-lucide="' + (repo.icon || 'box') + '"></i>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card-stats">' +
+          '<div class="stat-cell"><span class="stat-val">' + (repo.stars || 0) + '</span><span class="stat-label"><i data-lucide="star" style="color:#b45309;"></i> Stars</span></div>' +
+          '<div class="stat-cell"><span class="stat-val">' + (repo.forks || 0) + '</span><span class="stat-label"><i data-lucide="git-fork" style="color:#1e3a8a;"></i> Forks</span></div>' +
+          '<div class="stat-cell"><span class="stat-val">' + (repo.commits || 0) + '</span><span class="stat-label"><i data-lucide="git-commit" style="color:#046a38;"></i> Commits</span></div>' +
+          '<div class="stat-cell"><span class="stat-val">' + (repo.clones_14d || 0) + '</span><span class="stat-label"><i data-lucide="download" style="color:#0891b2;"></i> Clones</span></div>' +
+        '</div>' +
+        '<div class="card-footer">' +
+          '<div class="tag-list">' +
+            '<span class="tag">' + (repo.language || '—') + '</span>' +
+            (repo.license && repo.license !== 'None' ? '<span class="tag">' + repo.license + '</span>' : '') +
+            (repo.releases > 0 ? '<span class="tag">' + repo.releases + 'v</span>' : '') +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:0.75rem;">' +
+            (pagesLink ? '<a class="card-link" href="' + pagesLink + '" target="_blank" rel="noopener" style="color:#046a38;"><i data-lucide="globe" style="width:10px;height:10px;"></i> Demo</a>' : '') +
+            '<a class="card-link" href="' + repo.url + '" target="_blank" rel="noopener">GitHub <i data-lucide="arrow-up-right"></i></a>' +
+          '</div>' +
+        '</div>';
+
+      grid.appendChild(card);
+    });
+
+    // ── STATS GLOBALES TABLE (SORTABLE) ───────────────────────
+    document.getElementById('section-stats').style.display = 'flex';
+    document.getElementById('table-section').style.display = 'block';
+
+    const tableBody = document.getElementById('table-body');
+    let currentSort = { key: 'stars', order: 'desc' };
+
+    function renderTableRows() {
+      const sorted = [...repos].sort((a, b) => {
+        let valA = a[currentSort.key];
+        let valB = b[currentSort.key];
+
+        if (typeof valA === 'string') {
+          valA = (valA || '').toLowerCase();
+          valB = (valB || '').toLowerCase();
+          return currentSort.order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+
+        valA = valA || 0;
+        valB = valB || 0;
+        return currentSort.order === 'asc' ? valA - valB : valB - valA;
+      });
+
+      const tableRows = sorted.map(r => `
+        <tr>
+          <td>
+            <a class="table-repo-link" href="${r.url}" target="_blank" rel="noopener">
+              <i data-lucide="${r.icon || 'box'}" style="width:13px;height:13px;color:#1e3a8a;"></i>
+              <strong>${r.name}</strong>
+            </a>
+          </td>
+          <td><span class="table-tag">${r.language || '—'}</span></td>
+          <td style="color:var(--zinc-500);font-size:0.68rem;white-space:nowrap;">${r.created_at || '—'}</td>
+          <td class="num" style="font-weight:700;">${(r.stars || 0).toLocaleString()}</td>
+          <td class="num">${(r.forks || 0).toLocaleString()}</td>
+          <td class="num">${(r.clones_14d || 0).toLocaleString()}</td>
+          <td class="num">${(r.views_14d || 0).toLocaleString()}</td>
+          <td class="num">${(r.commits || 0).toLocaleString()}</td>
+          <td class="num">${r.releases > 0 ? r.releases + 'v' : '—'}</td>
+          <td class="num">${r.prs || 0}</td>
+          <td><span class="table-tag">${r.license && r.license !== 'None' ? r.license : 'MIT'}</span></td>
+        </tr>
+      `).join('');
+
+      const totalsRow = `
+        <tr class="table-totals-row">
+          <td><strong>TOTAL (${repos.length} PROYECTOS)</strong></td>
+          <td><span class="table-tag">ECOSISTEMA</span></td>
+          <td>—</td>
+          <td class="num">${(totals.stars || 0).toLocaleString()}</td>
+          <td class="num">${(totals.forks || 0).toLocaleString()}</td>
+          <td class="num">${(totals.clones_14d || 0).toLocaleString()}</td>
+          <td class="num">${(totals.views_14d || repos.reduce((s,r) => s + (r.views_14d||0),0)).toLocaleString()}</td>
+          <td class="num">${(totals.commits || 0).toLocaleString()}</td>
+          <td class="num">${totalReleases}v</td>
+          <td class="num">${totalPRs}</td>
+          <td>—</td>
+        </tr>
+      `;
+
+      tableBody.innerHTML = tableRows + totalsRow;
+      lucide.createIcons();
+    }
+
+    // Attach click listeners to headers
+    document.querySelectorAll('#main-stats-table th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (currentSort.key === key) {
+          currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSort.key = key;
+          currentSort.order = (key === 'name' || key === 'language' || key === 'license') ? 'asc' : 'desc';
+        }
+
+        // Update header classes and indicator
+        document.querySelectorAll('#main-stats-table th.sortable').forEach(h => {
+          h.classList.remove('sort-active');
+          const iconSpan = h.querySelector('.sort-icon');
+          if (iconSpan) iconSpan.textContent = '';
+        });
+
+        th.classList.add('sort-active');
+        const activeIconSpan = th.querySelector('.sort-icon');
+        if (activeIconSpan) {
+          activeIconSpan.textContent = currentSort.order === 'asc' ? ' ▲' : ' ▼';
+        }
+
+        renderTableRows();
+      });
+    });
+
+    // Default initial sort: Stars DESC
+    const defaultTh = document.querySelector('#main-stats-table th[data-sort="stars"]');
+    if (defaultTh) {
+      defaultTh.classList.add('sort-active');
+      const defSpan = defaultTh.querySelector('.sort-icon');
+      if (defSpan) defSpan.textContent = ' ▼';
+    }
+    renderTableRows();
+
+    // ── CONTRIBUTORS GRID ─────────────────────────────────────
+    const contributors = payload.contributors || [];
+    if (contributors.length > 0) {
+      document.getElementById('section-contrib').style.display = 'flex';
+      document.getElementById('contrib-section').style.display = 'block';
+
+      const contribGrid = document.getElementById('contrib-grid');
+      contribGrid.innerHTML = contributors.map(c => `
+        <a class="contrib-card" href="${c.html_url}" target="_blank" rel="noopener">
+          <img class="contrib-avatar" src="${c.avatar_url}" alt="${c.login}" />
+          <div class="contrib-info">
+            <div class="contrib-login">@${c.login}</div>
+            <div class="contrib-sub">${c.repos_count} repos con actividad</div>
+            <div class="contrib-commits">${c.contributions} commits registrados</div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    // ── SHOW CTA & FOOTER ─────────────────────────────────────
+    document.getElementById('cta-section').style.display = 'block';
+    document.getElementById('site-footer').style.display = 'block';
+
+    if (meta.target) {
+      const ownEl = document.getElementById('footer-owner-text');
+      if (ownEl) ownEl.innerText = '@' + meta.target;
+    }
+    if (meta.version) {
+      const verEl = document.getElementById('footer-version');
+      if (verEl) verEl.innerText = 'v' + meta.version;
+    }
+    if (meta.links?.github) {
+      const ghEl = document.getElementById('footer-gh-link');
+      if (ghEl) ghEl.href = meta.links.github;
+    }
+    if (meta.links?.website) {
+      const webEl = document.getElementById('footer-web-link');
+      if (webEl) webEl.href = meta.links.website;
+    }
+    if (meta.brand?.tagline) {
+      const tagEl = document.getElementById('footer-tagline');
+      if (tagEl) tagEl.innerText = meta.brand.tagline;
+    }
+
+    lucide.createIcons();
+  }
+
+  loadTelemetry().catch(console.error);
+  </script>
+</body>
+</html>
